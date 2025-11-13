@@ -1,0 +1,90 @@
+{
+  "quiz": {
+    "title": "Mixed Quiz - Direct and Randomized Questions",
+    "instructions": "<p>This quiz contains some questions that everyone will see, and some that are randomly selected from question pools.</p>",
+    "publish": false,
+    "quiz_settings": {
+      "allow_backtracking": true,
+      "shuffle_questions": false,
+      "shuffle_answers": true,
+      "has_time_limit": false
+    }
+  },
+  "item_banks": [
+    {
+      "name": "Practice Problems",
+      "description": "Pool of practice calculation problems",
+      "questions": [
+        {
+          "type": "numeric",
+          "title": "Fahrenheit to Celsius 1",
+          "body": "<p>Convert 32°F to Celsius.</p>",
+          "correct_value": "0",
+          "margin": "0.2",
+          "margin_type": "absolute",
+          "points": 3
+        },
+        {
+          "type": "numeric",
+          "title": "Fahrenheit to Celsius 2",
+          "body": "<p>Convert 212°F to Celsius.</p>",
+          "correct_value": "100",
+          "margin": "0.2",
+          "margin_type": "absolute",
+          "points": 3
+        },
+        {
+          "type": "numeric",
+          "title": "Fahrenheit to Celsius 3",
+          "body": "<p>Convert 68°F to Celsius (round to nearest integer).</p>",
+          "correct_value": "20",
+          "margin": "1",
+          "margin_type": "absolute",
+          "points": 3
+        },
+        {
+          "type": "numeric",
+          "title": "Celsius to Fahrenheit 1",
+          "body": "<p>Convert -40°C to Fahrenheit.</p>",
+          "correct_value": "-40",
+          "margin": "0.2",
+          "margin_type": "absolute",
+          "points": 3
+        }
+      ]
+    }
+  ],
+  "quiz_structure": [
+    {
+      "type": "direct_question",
+      "question": {
+        "type": "multiple_choice",
+        "title": "Introduction Question (Everyone sees this)",
+        "body": "<p>What does °C stand for?</p>",
+        "shuffle_answers": true,
+        "points": 2,
+        "answers": [
+          {"text": "Degrees Celsius", "correct": true},
+          {"text": "Degrees Centigrade", "correct": true},
+          {"text": "Degrees Centimeter", "correct": false},
+          {"text": "Degrees Carbon", "correct": false}
+        ]
+      }
+    },
+    {
+      "type": "item_bank_group",
+      "bank_name": "Practice Problems",
+      "pick_count": 2,
+      "points_per_item": 3
+    },
+    {
+      "type": "direct_question",
+      "question": {
+        "type": "essay",
+        "title": "Reflection Question (Everyone sees this)",
+        "body": "<p>Explain in your own words why scientists prefer to use Kelvin instead of Celsius for many calculations.</p>",
+        "points": 5
+      }
+    }
+  ]
+}
