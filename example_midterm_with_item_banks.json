@@ -1,0 +1,159 @@
+{
+  "quiz": {
+    "title": "Midterm Exam - Temperature Conversions",
+    "instructions": "<p>Complete the following questions. Each student will receive a randomized selection of questions.</p>",
+    "publish": false,
+    "quiz_settings": {
+      "allow_backtracking": true,
+      "shuffle_questions": true,
+      "shuffle_answers": true,
+      "has_time_limit": true,
+      "time_limit": 60
+    }
+  },
+  "item_banks": [
+    {
+      "name": "Numeric Temperature Questions",
+      "description": "Pool of numeric temperature conversion questions",
+      "questions": [
+        {
+          "type": "numeric",
+          "title": "Freezing point",
+          "body": "<p>What is the freezing point of water in Celsius?</p>",
+          "correct_value": "0",
+          "margin": "0.2",
+          "margin_type": "absolute",
+          "points": 2
+        },
+        {
+          "type": "numeric",
+          "title": "Boiling point",
+          "body": "<p>Enter the boiling point of water in Celsius.</p>",
+          "correct_value": "100",
+          "margin": "0.5",
+          "margin_type": "absolute",
+          "points": 2
+        },
+        {
+          "type": "numeric",
+          "title": "Room temperature from Kelvin",
+          "body": "<p>Typical room temperature is approximately 298.15 Kelvin. Convert it to Celsius.</p>",
+          "correct_value": "25",
+          "margin": "1",
+          "margin_type": "absolute",
+          "points": 2
+        },
+        {
+          "type": "numeric",
+          "title": "Body temperature",
+          "body": "<p>Normal human body temperature is 98.6°F. Convert it to Celsius (round to 1 decimal place).</p>",
+          "correct_value": "37.0",
+          "margin": "0.5",
+          "margin_type": "absolute",
+          "points": 2
+        },
+        {
+          "type": "numeric",
+          "title": "Absolute zero",
+          "body": "<p>Absolute zero is -273.15°C. Convert it to Kelvin.</p>",
+          "correct_value": "0",
+          "margin": "0.1",
+          "margin_type": "absolute",
+          "points": 2
+        }
+      ]
+    },
+    {
+      "name": "Multiple Choice Temperature Concepts",
+      "description": "Pool of multiple choice questions about temperature",
+      "questions": [
+        {
+          "type": "multiple_choice",
+          "title": "Temperature scale origin",
+          "body": "<p>Which temperature scale has its zero point at absolute zero?</p>",
+          "shuffle_answers": true,
+          "points": 3,
+          "answers": [
+            {"text": "Kelvin", "correct": true},
+            {"text": "Celsius", "correct": false},
+            {"text": "Fahrenheit", "correct": false},
+            {"text": "Rankine", "correct": false}
+          ]
+        },
+        {
+          "type": "multiple_choice",
+          "title": "Freezing vs Boiling",
+          "body": "<p>How many degrees Celsius separate the freezing and boiling points of water?</p>",
+          "shuffle_answers": true,
+          "points": 3,
+          "answers": [
+            {"text": "100", "correct": true},
+            {"text": "180", "correct": false},
+            {"text": "212", "correct": false},
+            {"text": "273", "correct": false}
+          ]
+        },
+        {
+          "type": "multiple_choice",
+          "title": "Temperature conversion formula",
+          "body": "<p>What is the correct formula to convert Celsius (C) to Fahrenheit (F)?</p>",
+          "shuffle_answers": true,
+          "points": 3,
+          "answers": [
+            {"text": "F = (9/5)C + 32", "correct": true},
+            {"text": "F = (5/9)C + 32", "correct": false},
+            {"text": "F = C + 273.15", "correct": false},
+            {"text": "F = C - 32", "correct": false}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "True/False Temperature Facts",
+      "description": "Pool of true/false questions about temperature",
+      "questions": [
+        {
+          "type": "true_false",
+          "title": "Celsius scale inventor",
+          "body": "<p>True or False: The Celsius scale was invented by Anders Celsius.</p>",
+          "correct_answer": true,
+          "points": 2
+        },
+        {
+          "type": "true_false",
+          "title": "Same temperature",
+          "body": "<p>True or False: -40°C equals -40°F.</p>",
+          "correct_answer": true,
+          "points": 2
+        },
+        {
+          "type": "true_false",
+          "title": "Absolute zero achievable",
+          "body": "<p>True or False: It is possible to reach absolute zero temperature in a laboratory.</p>",
+          "correct_answer": false,
+          "points": 2
+        }
+      ]
+    }
+  ],
+  "quiz_structure": [
+    {
+      "type": "item_bank_group",
+      "bank_name": "Numeric Temperature Questions",
+      "pick_count": 3,
+      "points_per_item": 2
+    },
+    {
+      "type": "item_bank_group",
+      "bank_name": "Multiple Choice Temperature Concepts",
+      "pick_count": 2,
+      "points_per_item": 3
+    },
+    {
+      "type": "item_bank_group",
+      "bank_name": "True/False Temperature Facts",
+      "pick_count": 2,
+      "points_per_item": 2
+    }
+  ]
+}
