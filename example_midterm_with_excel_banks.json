@@ -1,0 +1,189 @@
+{
+  "quiz": {
+    "title": "Midterm Exam - Data Analysis with Excel",
+    "instructions": "<h2>Midterm Examination</h2><p><strong>Important:</strong> This exam uses randomized questions. Each student will receive a different set of questions from the question pools.</p><p><strong>Required Files:</strong> Download the Excel files below. You will need them to answer the questions.</p><p><strong>Time Limit:</strong> 60 minutes</p><p><strong>Instructions:</strong></p><ul><li>Download all required Excel files</li><li>Complete the calculations in Excel</li><li>Answer the questions based on your analysis</li><li>You may use Excel functions and formulas</li><li>Show your work in your Excel file (you may be asked to upload it separately)</li></ul>",
+    "attached_files": ["temp_data", "sales_data", "stats_data"],
+    "publish": false,
+    "quiz_settings": {
+      "allow_backtracking": true,
+      "shuffle_questions": true,
+      "shuffle_answers": true,
+      "has_time_limit": true,
+      "time_limit": 60
+    }
+  },
+  "files": {
+    "temp_data": "temperature_data.xlsx",
+    "sales_data": "sales_data.xlsx",
+    "stats_data": "statistics_data.xlsx"
+  },
+  "item_banks": [
+    {
+      "name": "Temperature Analysis Questions",
+      "description": "Questions requiring analysis of temperature_data.xlsx",
+      "questions": [
+        {
+          "type": "numeric",
+          "title": "Average Temperature",
+          "body": "<p>Using the <strong>temperature_data.xlsx</strong> file, calculate the average temperature in Celsius. (Round to 1 decimal)</p>",
+          "attached_file": "temp_data",
+          "correct_value": "25.3",
+          "margin": "0.5",
+          "margin_type": "absolute",
+          "points": 5,
+          "calculator_type": "basic"
+        },
+        {
+          "type": "numeric",
+          "title": "Temperature Variance",
+          "body": "<p>Using the <strong>temperature_data.xlsx</strong> file, calculate the variance of temperatures in Celsius. (Round to 2 decimals)</p>",
+          "attached_file": "temp_data",
+          "correct_value": "32.15",
+          "margin": "1.0",
+          "margin_type": "absolute",
+          "points": 5,
+          "calculator_type": "scientific"
+        },
+        {
+          "type": "numeric",
+          "title": "Median Temperature",
+          "body": "<p>Using the <strong>temperature_data.xlsx</strong> file, find the median temperature in Fahrenheit. (Round to 1 decimal)</p>",
+          "attached_file": "temp_data",
+          "correct_value": "68.5",
+          "margin": "0.5",
+          "margin_type": "absolute",
+          "points": 5,
+          "calculator_type": "basic"
+        },
+        {
+          "type": "multiple_choice",
+          "title": "Temperature Distribution",
+          "body": "<p>Based on your analysis of <strong>temperature_data.xlsx</strong>, which best describes the temperature distribution?</p>",
+          "attached_file": "temp_data",
+          "shuffle_answers": true,
+          "points": 5,
+          "answers": [
+            {"text": "Most temperatures cluster around the mean", "correct": true},
+            {"text": "Temperatures are evenly distributed", "correct": false},
+            {"text": "There is a clear bimodal distribution", "correct": false},
+            {"text": "All temperatures are outliers", "correct": false}
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sales Analysis Questions",
+      "description": "Questions requiring analysis of sales_data.xlsx",
+      "questions": [
+        {
+          "type": "numeric",
+          "title": "Total Revenue Calculation",
+          "body": "<p>Using <strong>sales_data.xlsx</strong>, calculate the total revenue across ALL products and months. (Round to nearest dollar)</p>",
+          "attached_file": "sales_data",
+          "correct_value": "45678",
+          "margin": "100",
+          "margin_type": "absolute",
+          "points": 6,
+          "calculator_type": "basic"
+        },
+        {
+          "type": "multiple_choice",
+          "title": "Best Performing Product",
+          "body": "<p>Based on <strong>sales_data.xlsx</strong>, which product generated the highest total revenue?</p>",
+          "attached_file": "sales_data",
+          "shuffle_answers": true,
+          "points": 6,
+          "answers": [
+            {"text": "Product A", "correct": false},
+            {"text": "Product B", "correct": true},
+            {"text": "Product C", "correct": false},
+            {"text": "Product D", "correct": false},
+            {"text": "Product E", "correct": false}
+          ]
+        },
+        {
+          "type": "numeric",
+          "title": "Average Monthly Sales",
+          "body": "<p>Using <strong>sales_data.xlsx</strong>, calculate the average units sold per month across all products. (Round to nearest whole number)</p>",
+          "attached_file": "sales_data",
+          "correct_value": "125",
+          "margin": "5",
+          "margin_type": "absolute",
+          "points": 6,
+          "calculator_type": "basic"
+        }
+      ]
+    },
+    {
+      "name": "Statistics Analysis Questions",
+      "description": "Questions requiring analysis of statistics_data.xlsx",
+      "questions": [
+        {
+          "type": "numeric",
+          "title": "Mean Test Score",
+          "body": "<p>Using <strong>statistics_data.xlsx</strong>, calculate the mean test score. (Round to 2 decimals)</p>",
+          "attached_file": "stats_data",
+          "correct_value": "82.45",
+          "margin": "0.5",
+          "margin_type": "absolute",
+          "points": 5,
+          "calculator_type": "basic"
+        },
+        {
+          "type": "numeric",
+          "title": "Standard Deviation of Scores",
+          "body": "<p>Using <strong>statistics_data.xlsx</strong>, calculate the standard deviation of test scores. (Round to 2 decimals)</p>",
+          "attached_file": "stats_data",
+          "correct_value": "9.87",
+          "margin": "0.5",
+          "margin_type": "absolute",
+          "points": 5,
+          "calculator_type": "scientific"
+        },
+        {
+          "type": "multiple_choice",
+          "title": "Quartile Analysis",
+          "body": "<p>Based on <strong>statistics_data.xlsx</strong>, what is the approximate first quartile (Q1) of the test scores?</p>",
+          "attached_file": "stats_data",
+          "shuffle_answers": true,
+          "points": 5,
+          "answers": [
+            {"text": "75", "correct": true},
+            {"text": "80", "correct": false},
+            {"text": "85", "correct": false},
+            {"text": "90", "correct": false}
+          ]
+        }
+      ]
+    }
+  ],
+  "quiz_structure": [
+    {
+      "type": "item_bank_group",
+      "bank_name": "Temperature Analysis Questions",
+      "pick_count": 2,
+      "points_per_item": 5
+    },
+    {
+      "type": "item_bank_group",
+      "bank_name": "Sales Analysis Questions",
+      "pick_count": 2,
+      "points_per_item": 6
+    },
+    {
+      "type": "item_bank_group",
+      "bank_name": "Statistics Analysis Questions",
+      "pick_count": 2,
+      "points_per_item": 5
+    },
+    {
+      "type": "direct_question",
+      "question": {
+        "type": "essay",
+        "title": "Reflection: Data Analysis Process",
+        "body": "<p><strong>This question is the same for all students.</strong></p><p>Reflect on the data analysis process you used in this exam. Describe:</p><ol><li>Which Excel functions were most useful?</li><li>Any challenges you encountered</li><li>How you verified your answers</li></ol><p>Write 5-7 sentences.</p>",
+        "points": 10
+      }
+    }
+  ]
+}
