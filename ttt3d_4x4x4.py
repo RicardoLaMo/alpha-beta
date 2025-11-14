@@ -218,7 +218,7 @@ class TTT3D:
         # Create GUI
         self.root = tk.Tk()
         self.root.title("3D Tic-Tac-Toe (3x3x3)")
-        self.root.geometry("650x500")
+        self.root.geometry("550x750")
         self.root.resizable(False, False)
 
         self.setup_gui()
@@ -303,37 +303,54 @@ class TTT3D:
         main_container = tk.Frame(self.root)
         main_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
-        # Left side - Game boards
-        board_frame = tk.Frame(main_container)
-        board_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        # Center - Game boards (stacked vertically)
+        board_container = tk.Frame(main_container)
+        board_container.pack(side=tk.TOP, pady=10)
 
-        # Create 3 layers of 3x3 boards
+        # Create 3 layers of 3x3 boards - stacked from top to bottom
+        # Color gradient to show depth (lighter = higher)
+        layer_colors = ['#ffffff', '#f5f5f5', '#ebebeb']
+        layer_names = ['Top', 'Middle', 'Bottom']
+
         for layer in range(3):
-            layer_frame = tk.LabelFrame(
-                board_frame,
-                text=f"Layer {layer + 1}",
-                font=('Tahoma', 10, 'bold'),
-                padx=5,
-                pady=5,
-                bg='#f0f0f0'
+            # Add extra visual spacing between layers for 3D effect
+            layer_spacing = 20 if layer > 0 else 0
+
+            # Create shadow effect frame
+            shadow_frame = tk.Frame(
+                board_container,
+                bg='#999999',
+                relief=tk.FLAT
             )
-            layer_frame.grid(row=0, column=layer, padx=5, pady=5)
+            shadow_frame.grid(row=layer, column=0, padx=10, pady=(layer_spacing, 5))
+
+            layer_frame = tk.LabelFrame(
+                shadow_frame,
+                text=f"Layer {3 - layer} ({layer_names[layer]})",
+                font=('Tahoma', 11, 'bold'),
+                padx=10,
+                pady=10,
+                bg=layer_colors[layer],
+                relief=tk.RAISED,
+                bd=4
+            )
+            layer_frame.pack(padx=2, pady=2)
 
             # Create 3x3 grid for this layer
             for row in range(3):
                 for col in range(3):
                     # Create a frame to hold the canvas
-                    cell_frame = tk.Frame(layer_frame, bg='white', relief=tk.RAISED, bd=2)
-                    cell_frame.grid(row=row, column=col, padx=2, pady=2)
+                    cell_frame = tk.Frame(layer_frame, bg=layer_colors[layer], relief=tk.RAISED, bd=2)
+                    cell_frame.grid(row=row, column=col, padx=3, pady=3)
 
                     # Create canvas for drawing fancy icons
                     canvas = Canvas(
                         cell_frame,
-                        width=45,
-                        height=45,
-                        bg='white',
-                        highlightthickness=1,
-                        highlightbackground='#cccccc',
+                        width=50,
+                        height=50,
+                        bg=layer_colors[layer],
+                        highlightthickness=2,
+                        highlightbackground='#aaaaaa',
                         cursor='hand2'
                     )
                     canvas.pack()
@@ -345,23 +362,23 @@ class TTT3D:
                     # Store canvas reference in board_buttons for compatibility
                     self.board_buttons[layer][row][col] = canvas
 
-        # Right side - Controls
-        control_frame = tk.Frame(main_container, width=200)
-        control_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=10)
+        # Bottom - Controls
+        control_frame = tk.Frame(main_container)
+        control_frame.pack(side=tk.BOTTOM, fill=tk.X, padx=10, pady=10)
 
-        # New Game button
-        tk.Button(
-            control_frame,
-            text="New Game",
-            font=('Tahoma', 12),
-            command=self.new_game,
-            bg='lightblue',
-            width=15
-        ).pack(pady=10)
+        # Create a grid layout for controls
+        left_controls = tk.Frame(control_frame)
+        left_controls.pack(side=tk.LEFT, padx=20)
 
-        # Piece selection
-        piece_frame = tk.LabelFrame(control_frame, text="Your Piece", font=('Tahoma', 10))
-        piece_frame.pack(fill=tk.X, pady=5)
+        center_controls = tk.Frame(control_frame)
+        center_controls.pack(side=tk.LEFT, padx=20)
+
+        right_controls = tk.Frame(control_frame)
+        right_controls.pack(side=tk.LEFT, padx=20)
+
+        # Piece selection (Left)
+        piece_frame = tk.LabelFrame(left_controls, text="Your Piece", font=('Tahoma', 10))
+        piece_frame.pack()
 
         self.piece_var = tk.StringVar(value='X')
         tk.Radiobutton(
@@ -370,18 +387,18 @@ class TTT3D:
             variable=self.piece_var,
             value='X',
             command=self.change_piece
-        ).pack(anchor=tk.W)
+        ).pack(anchor=tk.W, padx=5)
         tk.Radiobutton(
             piece_frame,
             text="O",
             variable=self.piece_var,
             value='O',
             command=self.change_piece
-        ).pack(anchor=tk.W)
+        ).pack(anchor=tk.W, padx=5)
 
-        # First move selection
-        first_frame = tk.LabelFrame(control_frame, text="First Move", font=('Tahoma', 10))
-        first_frame.pack(fill=tk.X, pady=5)
+        # First move selection (Center)
+        first_frame = tk.LabelFrame(center_controls, text="First Move", font=('Tahoma', 10))
+        first_frame.pack()
 
         self.first_var = tk.StringVar(value='Human')
         tk.Radiobutton(
@@ -390,18 +407,18 @@ class TTT3D:
             variable=self.first_var,
             value='Human',
             command=self.change_first
-        ).pack(anchor=tk.W)
+        ).pack(anchor=tk.W, padx=5)
         tk.Radiobutton(
             first_frame,
             text="CPU First",
             variable=self.first_var,
             value='CPU',
             command=self.change_first
-        ).pack(anchor=tk.W)
+        ).pack(anchor=tk.W, padx=5)
 
-        # Difficulty selection
-        diff_frame = tk.LabelFrame(control_frame, text="Difficulty", font=('Tahoma', 10))
-        diff_frame.pack(fill=tk.X, pady=5)
+        # Difficulty selection (Right)
+        diff_frame = tk.LabelFrame(right_controls, text="Difficulty", font=('Tahoma', 10))
+        diff_frame.pack()
 
         self.diff_var = tk.StringVar(value='Medium')
         tk.Radiobutton(
@@ -410,31 +427,46 @@ class TTT3D:
             variable=self.diff_var,
             value='Easy',
             command=self.change_difficulty
-        ).pack(anchor=tk.W)
+        ).pack(anchor=tk.W, padx=5)
         tk.Radiobutton(
             diff_frame,
             text="Medium",
             variable=self.diff_var,
             value='Medium',
             command=self.change_difficulty
-        ).pack(anchor=tk.W)
+        ).pack(anchor=tk.W, padx=5)
         tk.Radiobutton(
             diff_frame,
             text="Hard",
             variable=self.diff_var,
             value='Hard',
             command=self.change_difficulty
-        ).pack(anchor=tk.W)
+        ).pack(anchor=tk.W, padx=5)
 
-        # Instructions
+        # New Game button and instructions (bottom center)
+        bottom_controls = tk.Frame(main_container)
+        bottom_controls.pack(side=tk.BOTTOM, pady=5)
+
+        tk.Button(
+            bottom_controls,
+            text="New Game",
+            font=('Tahoma', 12, 'bold'),
+            command=self.new_game,
+            bg='#4CAF50',
+            fg='white',
+            width=15,
+            height=2,
+            cursor='hand2'
+        ).pack()
+
         instructions = tk.Label(
-            control_frame,
-            text="Get 3 in a row\nto win!",
-            font=('Tahoma', 10),
+            bottom_controls,
+            text="Get 3 in a row vertically through layers to win in 3D!",
+            font=('Tahoma', 9, 'italic'),
             justify=tk.CENTER,
             fg='darkblue'
         )
-        instructions.pack(pady=20)
+        instructions.pack(pady=5)
 
     def change_piece(self):
         """Handle piece selection change"""
@@ -497,6 +529,8 @@ class TTT3D:
         self.final_win = []
         self.final_win_buttons = []
 
+        layer_colors = ['#ffffff', '#f5f5f5', '#ebebeb']
+
         for layer in range(3):
             for row in range(3):
                 for col in range(3):
@@ -504,7 +538,7 @@ class TTT3D:
                     # Clear the canvas
                     canvas = self.board_canvases[layer][row][col]
                     canvas.delete("all")
-                    canvas.config(bg='white', cursor='hand2')
+                    canvas.config(bg=layer_colors[layer], cursor='hand2')
 
     def human_move(self, layer: int, row: int, col: int):
         """Handle human player move"""
@@ -516,11 +550,11 @@ class TTT3D:
 
         # Draw fancy icon
         canvas = self.board_canvases[layer][row][col]
-        canvas.config(bg='#f5f5f5', cursor='')
+        canvas.config(bg='#e8f4f8', cursor='')
         if self.human_piece == 'X':
-            FancyIcon.draw_x(canvas, 45)
+            FancyIcon.draw_x(canvas, 50)
         else:
-            FancyIcon.draw_o(canvas, 45)
+            FancyIcon.draw_o(canvas, 50)
 
         # Check for win
         move = OneMove(layer, row, col)
@@ -553,11 +587,11 @@ class TTT3D:
 
             # Draw fancy icon
             canvas = self.board_canvases[layer][row][col]
-            canvas.config(bg='#f5f5f5', cursor='')
+            canvas.config(bg='#e8f4f8', cursor='')
             if self.computer_piece == 'X':
-                FancyIcon.draw_x(canvas, 45)
+                FancyIcon.draw_x(canvas, 50)
             else:
-                FancyIcon.draw_o(canvas, 45)
+                FancyIcon.draw_o(canvas, 50)
 
     def computer_plays(self):
         """Computer makes a move using minimax algorithm"""
@@ -580,11 +614,11 @@ class TTT3D:
 
                             # Draw fancy icon
                             canvas = self.board_canvases[layer][row][col]
-                            canvas.config(bg='#f5f5f5', cursor='')
+                            canvas.config(bg='#e8f4f8', cursor='')
                             if self.computer_piece == 'X':
-                                FancyIcon.draw_x(canvas, 45)
+                                FancyIcon.draw_x(canvas, 50)
                             else:
-                                FancyIcon.draw_o(canvas, 45)
+                                FancyIcon.draw_o(canvas, 50)
 
                             self.status_label.config(
                                 text="I win! Press New Game to play again.",
@@ -626,11 +660,11 @@ class TTT3D:
 
             # Draw fancy icon
             canvas = self.board_canvases[layer][row][col]
-            canvas.config(bg='#f5f5f5', cursor='')
+            canvas.config(bg='#e8f4f8', cursor='')
             if self.computer_piece == 'X':
-                FancyIcon.draw_x(canvas, 45)
+                FancyIcon.draw_x(canvas, 50)
             else:
-                FancyIcon.draw_o(canvas, 45)
+                FancyIcon.draw_o(canvas, 50)
 
     def look_ahead(self, player_value: int, alpha: int, beta: int) -> int:
         """Minimax algorithm with alpha-beta pruning"""
@@ -772,9 +806,9 @@ class TTT3D:
                     if (layer, row, col) in self.final_win_buttons:
                         piece_value = self.config[layer][row][col]
                         if piece_value == 0:  # X
-                            FancyIcon.draw_x_win(canvas, 45)
+                            FancyIcon.draw_x_win(canvas, 50)
                         elif piece_value == 1:  # O
-                            FancyIcon.draw_o_win(canvas, 45)
+                            FancyIcon.draw_o_win(canvas, 50)
 
     def update_score(self):
         """Update the score display"""

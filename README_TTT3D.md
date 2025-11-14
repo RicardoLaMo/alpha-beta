@@ -76,13 +76,29 @@ python3 ttt3d_4x4x4.py
 
 ## Game Board Layout
 
-The game displays 3 layers arranged horizontally:
+The game displays 3 layers **stacked vertically** with visual depth:
 
 ```
-Layer 1 | Layer 2 | Layer 3
+┌─────────────┐
+│  Layer 3    │  (Top)
+│  (Lightest) │
+└─────────────┘
+     ↓↓↓
+┌─────────────┐
+│  Layer 2    │  (Middle)
+│             │
+└─────────────┘
+     ↓↓↓
+┌─────────────┐
+│  Layer 1    │  (Bottom)
+│  (Darkest)  │
+└─────────────┘
 ```
 
-Each layer is a 3x3 grid. Think of these as stacked on top of each other.
+Each layer is a 3x3 grid with:
+- **Shadow effects** to create depth
+- **Color gradients** (lighter = higher layer)
+- **Vertical spacing** between layers for 3D visualization
 
 ## Technical Details
 
@@ -166,9 +182,9 @@ This will show:
 
 ## Known Limitations
 
-- No 3D perspective drawing of the boards (uses simple 2x2 layer layout instead)
-- On hard difficulty, the AI can take a few seconds to compute moves
+- On hard difficulty, the AI can take a few seconds to compute moves (it's thinking 6 moves ahead!)
 - Requires tkinter for GUI (usually included with Python)
+- Board visualization uses vertical stacking rather than true 3D perspective rendering
 
 ## Credits
 
