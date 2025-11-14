@@ -322,7 +322,7 @@ class TTT3D:
             # Create 4x4 grid for this layer
             for row in range(4):
                 for col in range(4):
-                    # Create a frame to hold both button and canvas
+                    # Create a frame to hold the canvas
                     cell_frame = tk.Frame(layer_frame, bg='white', relief=tk.RAISED, bd=2)
                     cell_frame.grid(row=row, column=col, padx=2, pady=2)
 
@@ -332,26 +332,18 @@ class TTT3D:
                         width=45,
                         height=45,
                         bg='white',
-                        highlightthickness=0
+                        highlightthickness=1,
+                        highlightbackground='#cccccc',
+                        cursor='hand2'
                     )
                     canvas.pack()
                     self.board_canvases[layer][row][col] = canvas
 
-                    # Create invisible button overlay for clicks
-                    btn = tk.Button(
-                        cell_frame,
-                        text="",
-                        font=('Arial', 1),
-                        width=6,
-                        height=2,
-                        command=lambda l=layer, r=row, c=col: self.human_move(l, r, c),
-                        bg='white',
-                        activebackground='#e0e0e0',
-                        relief=tk.FLAT,
-                        cursor='hand2'
-                    )
-                    btn.place(x=0, y=0, width=45, height=45)
-                    self.board_buttons[layer][row][col] = btn
+                    # Bind click event directly to canvas
+                    canvas.bind('<Button-1>', lambda event, l=layer, r=row, c=col: self.human_move(l, r, c))
+
+                    # Store canvas reference in board_buttons for compatibility
+                    self.board_buttons[layer][row][col] = canvas
 
         # Right side - Controls
         control_frame = tk.Frame(main_container, width=200)
@@ -509,11 +501,10 @@ class TTT3D:
             for row in range(4):
                 for col in range(4):
                     self.config[layer][row][col] = -1
-                    btn = self.board_buttons[layer][row][col]
-                    btn.config(state=tk.NORMAL, bg='white')
                     # Clear the canvas
                     canvas = self.board_canvases[layer][row][col]
                     canvas.delete("all")
+                    canvas.config(bg='white', cursor='hand2')
 
     def human_move(self, layer: int, row: int, col: int):
         """Handle human player move"""
@@ -522,10 +513,10 @@ class TTT3D:
 
         # Make the move
         self.config[layer][row][col] = 0 if self.human_piece == 'X' else 1
-        self.board_buttons[layer][row][col].config(state=tk.DISABLED, bg='#f5f5f5')
 
         # Draw fancy icon
         canvas = self.board_canvases[layer][row][col]
+        canvas.config(bg='#f5f5f5', cursor='')
         if self.human_piece == 'X':
             FancyIcon.draw_x(canvas, 45)
         else:
@@ -559,10 +550,10 @@ class TTT3D:
             layer, row, col = random.choice(empty_spaces)
             piece_value = 1 if self.computer_piece == 'X' else 0
             self.config[layer][row][col] = piece_value
-            self.board_buttons[layer][row][col].config(state=tk.DISABLED, bg='#f5f5f5')
 
             # Draw fancy icon
             canvas = self.board_canvases[layer][row][col]
+            canvas.config(bg='#f5f5f5', cursor='')
             if self.computer_piece == 'X':
                 FancyIcon.draw_x(canvas, 45)
             else:
@@ -586,10 +577,10 @@ class TTT3D:
                         if self.check_win(computer_value, move):
                             # Make the winning move
                             self.config[layer][row][col] = computer_value
-                            self.board_buttons[layer][row][col].config(state=tk.DISABLED, bg='#f5f5f5')
 
                             # Draw fancy icon
                             canvas = self.board_canvases[layer][row][col]
+                            canvas.config(bg='#f5f5f5', cursor='')
                             if self.computer_piece == 'X':
                                 FancyIcon.draw_x(canvas, 45)
                             else:
@@ -632,10 +623,10 @@ class TTT3D:
             layer, row, col = best_move
             computer_value = 1 if self.computer_piece == 'X' else 0
             self.config[layer][row][col] = computer_value
-            self.board_buttons[layer][row][col].config(state=tk.DISABLED, bg='#f5f5f5')
 
             # Draw fancy icon
             canvas = self.board_canvases[layer][row][col]
+            canvas.config(bg='#f5f5f5', cursor='')
             if self.computer_piece == 'X':
                 FancyIcon.draw_x(canvas, 45)
             else:
@@ -770,16 +761,15 @@ class TTT3D:
                 col = remainder % 4
                 self.final_win_buttons.append((layer, row, col))
 
-        # Disable all buttons and redraw winning pieces in gold
+        # Disable all canvases and redraw winning pieces in gold
         for layer in range(4):
             for row in range(4):
                 for col in range(4):
-                    btn = self.board_buttons[layer][row][col]
-                    btn.config(state=tk.DISABLED)
+                    canvas = self.board_canvases[layer][row][col]
+                    canvas.config(cursor='')
 
                     # Redraw winning pieces in gold
                     if (layer, row, col) in self.final_win_buttons:
-                        canvas = self.board_canvases[layer][row][col]
                         piece_value = self.config[layer][row][col]
                         if piece_value == 0:  # X
                             FancyIcon.draw_x_win(canvas, 45)
