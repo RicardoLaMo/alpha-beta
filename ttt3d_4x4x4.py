@@ -182,9 +182,9 @@ class TTT3D:
 
     def __init__(self):
         # Game configuration
-        self.BOARD_SIZE = 4  # 4x4x4 board
-        self.LAYERS = 4
-        self.WIN_LENGTH = 4  # Need 4 in a row to win
+        self.BOARD_SIZE = 3  # 3x3x3 board
+        self.LAYERS = 3
+        self.WIN_LENGTH = 3  # Need 3 in a row to win
 
         # Game state
         self.config = [[[-1 for _ in range(self.BOARD_SIZE)]
@@ -217,63 +217,63 @@ class TTT3D:
 
         # Create GUI
         self.root = tk.Tk()
-        self.root.title("3D Tic-Tac-Toe (4x4x4)")
-        self.root.geometry("700x650")
+        self.root.title("3D Tic-Tac-Toe (3x3x3)")
+        self.root.geometry("650x500")
         self.root.resizable(False, False)
 
         self.setup_gui()
 
     def _generate_winning_combinations(self) -> List[List[int]]:
-        """Generate all possible winning combinations for 4x4x4 board"""
+        """Generate all possible winning combinations for 3x3x3 board"""
         wins = []
 
         # Helper function to convert 3D coordinates to 1D index
         def coord_to_index(layer, row, col):
-            return layer * 16 + row * 4 + col
+            return layer * 9 + row * 3 + col
 
         # 1. Rows on each layer
-        for layer in range(4):
-            for row in range(4):
-                wins.append([coord_to_index(layer, row, col) for col in range(4)])
+        for layer in range(3):
+            for row in range(3):
+                wins.append([coord_to_index(layer, row, col) for col in range(3)])
 
         # 2. Columns on each layer
-        for layer in range(4):
-            for col in range(4):
-                wins.append([coord_to_index(layer, row, col) for row in range(4)])
+        for layer in range(3):
+            for col in range(3):
+                wins.append([coord_to_index(layer, row, col) for row in range(3)])
 
         # 3. Diagonals on each layer
-        for layer in range(4):
+        for layer in range(3):
             # Main diagonal
-            wins.append([coord_to_index(layer, i, i) for i in range(4)])
+            wins.append([coord_to_index(layer, i, i) for i in range(3)])
             # Anti-diagonal
-            wins.append([coord_to_index(layer, i, 3-i) for i in range(4)])
+            wins.append([coord_to_index(layer, i, 2-i) for i in range(3)])
 
         # 4. Vertical lines through layers
-        for row in range(4):
-            for col in range(4):
-                wins.append([coord_to_index(layer, row, col) for layer in range(4)])
+        for row in range(3):
+            for col in range(3):
+                wins.append([coord_to_index(layer, row, col) for layer in range(3)])
 
         # 5. Diagonal lines through layers (in vertical planes)
         # Front-to-back diagonals
-        for col in range(4):
+        for col in range(3):
             # Descending
-            wins.append([coord_to_index(i, i, col) for i in range(4)])
+            wins.append([coord_to_index(i, i, col) for i in range(3)])
             # Ascending
-            wins.append([coord_to_index(i, 3-i, col) for i in range(4)])
+            wins.append([coord_to_index(i, 2-i, col) for i in range(3)])
 
         # Left-to-right diagonals
-        for row in range(4):
+        for row in range(3):
             # Descending
-            wins.append([coord_to_index(i, row, i) for i in range(4)])
+            wins.append([coord_to_index(i, row, i) for i in range(3)])
             # Ascending
-            wins.append([coord_to_index(i, row, 3-i) for i in range(4)])
+            wins.append([coord_to_index(i, row, 2-i) for i in range(3)])
 
         # 6. Space diagonals (corner to corner)
         # Main space diagonals
-        wins.append([coord_to_index(i, i, i) for i in range(4)])  # (0,0,0) to (3,3,3)
-        wins.append([coord_to_index(i, i, 3-i) for i in range(4)])  # (0,0,3) to (3,3,0)
-        wins.append([coord_to_index(i, 3-i, i) for i in range(4)])  # (0,3,0) to (3,0,3)
-        wins.append([coord_to_index(i, 3-i, 3-i) for i in range(4)])  # (0,3,3) to (3,0,0)
+        wins.append([coord_to_index(i, i, i) for i in range(3)])  # (0,0,0) to (2,2,2)
+        wins.append([coord_to_index(i, i, 2-i) for i in range(3)])  # (0,0,2) to (2,2,0)
+        wins.append([coord_to_index(i, 2-i, i) for i in range(3)])  # (0,2,0) to (2,0,2)
+        wins.append([coord_to_index(i, 2-i, 2-i) for i in range(3)])  # (0,2,2) to (2,0,0)
 
         return wins
 
@@ -307,8 +307,8 @@ class TTT3D:
         board_frame = tk.Frame(main_container)
         board_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        # Create 4 layers of 4x4 boards
-        for layer in range(4):
+        # Create 3 layers of 3x3 boards
+        for layer in range(3):
             layer_frame = tk.LabelFrame(
                 board_frame,
                 text=f"Layer {layer + 1}",
@@ -317,11 +317,11 @@ class TTT3D:
                 pady=5,
                 bg='#f0f0f0'
             )
-            layer_frame.grid(row=layer // 2, column=layer % 2, padx=5, pady=5)
+            layer_frame.grid(row=0, column=layer, padx=5, pady=5)
 
-            # Create 4x4 grid for this layer
-            for row in range(4):
-                for col in range(4):
+            # Create 3x3 grid for this layer
+            for row in range(3):
+                for col in range(3):
                     # Create a frame to hold the canvas
                     cell_frame = tk.Frame(layer_frame, bg='white', relief=tk.RAISED, bd=2)
                     cell_frame.grid(row=row, column=col, padx=2, pady=2)
@@ -429,7 +429,7 @@ class TTT3D:
         # Instructions
         instructions = tk.Label(
             control_frame,
-            text="Get 4 in a row\nto win!",
+            text="Get 3 in a row\nto win!",
             font=('Tahoma', 10),
             justify=tk.CENTER,
             fg='darkblue'
@@ -470,7 +470,7 @@ class TTT3D:
             self.total_looks_ahead = 2
         else:  # Hard
             self.difficulty = 3
-            self.total_looks_ahead = 4  # Reduced from 6 due to larger board
+            self.total_looks_ahead = 6  # Full depth for 3x3x3 board
 
         self.clear_board()
         self.status_label.config(text="Good luck!", fg='black')
@@ -497,9 +497,9 @@ class TTT3D:
         self.final_win = []
         self.final_win_buttons = []
 
-        for layer in range(4):
-            for row in range(4):
-                for col in range(4):
+        for layer in range(3):
+            for row in range(3):
+                for col in range(3):
                     self.config[layer][row][col] = -1
                     # Clear the canvas
                     canvas = self.board_canvases[layer][row][col]
@@ -540,9 +540,9 @@ class TTT3D:
     def computer_play_random(self):
         """Computer makes a random move (used for easier difficulties when going first)"""
         empty_spaces = []
-        for layer in range(4):
-            for row in range(4):
-                for col in range(4):
+        for layer in range(3):
+            for row in range(3):
+                for col in range(3):
                     if self.config[layer][row][col] == -1:
                         empty_spaces.append((layer, row, col))
 
@@ -566,9 +566,9 @@ class TTT3D:
         computer_value = 1 if self.computer_piece == 'X' else 0
 
         # Check all possible moves
-        for layer in range(4):
-            for row in range(4):
-                for col in range(4):
+        for layer in range(3):
+            for row in range(3):
+                for col in range(3):
                     if self.config[layer][row][col] == -1:
                         # Try this move
                         move = OneMove(layer, row, col)
@@ -642,9 +642,9 @@ class TTT3D:
 
         if player_value == computer_value:
             # Computer's turn (maximizing)
-            for layer in range(4):
-                for row in range(4):
-                    for col in range(4):
+            for layer in range(3):
+                for row in range(3):
+                    for col in range(3):
                         if self.config[layer][row][col] == -1:
                             move = OneMove(layer, row, col)
 
@@ -669,9 +669,9 @@ class TTT3D:
             return alpha
         else:
             # Human's turn (minimizing)
-            for layer in range(4):
-                for row in range(4):
-                    for col in range(4):
+            for layer in range(3):
+                for row in range(3):
+                    for col in range(3):
                         if self.config[layer][row][col] == -1:
                             move = OneMove(layer, row, col)
 
@@ -705,11 +705,11 @@ class TTT3D:
         self.config[move.layer][move.row][move.column] = player_value
 
         # Create game board array
-        game_board = [0] * 64
+        game_board = [0] * 27
         index = 0
-        for layer in range(4):
-            for row in range(4):
-                for col in range(4):
+        for layer in range(3):
+            for row in range(3):
+                for col in range(3):
                     if self.config[layer][row][col] == player_value:
                         game_board[index] = 1
                     index += 1
@@ -732,11 +732,11 @@ class TTT3D:
         win_counter = 0
 
         # Create game board array
-        game_board = [0] * 64
+        game_board = [0] * 27
         index = 0
-        for layer in range(4):
-            for row in range(4):
-                for col in range(4):
+        for layer in range(3):
+            for row in range(3):
+                for col in range(3):
                     if (self.config[layer][row][col] == player_value or
                         self.config[layer][row][col] == -1):
                         game_board[index] = 1
@@ -755,16 +755,16 @@ class TTT3D:
             # Convert winning indices to button coordinates
             self.final_win_buttons = []
             for idx in self.final_win:
-                layer = idx // 16
-                remainder = idx % 16
-                row = remainder // 4
-                col = remainder % 4
+                layer = idx // 9
+                remainder = idx % 9
+                row = remainder // 3
+                col = remainder % 3
                 self.final_win_buttons.append((layer, row, col))
 
         # Disable all canvases and redraw winning pieces in gold
-        for layer in range(4):
-            for row in range(4):
-                for col in range(4):
+        for layer in range(3):
+            for row in range(3):
+                for col in range(3):
                     canvas = self.board_canvases[layer][row][col]
                     canvas.config(cursor='')
 

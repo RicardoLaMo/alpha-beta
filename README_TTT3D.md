@@ -1,12 +1,12 @@
-# 3D Tic-Tac-Toe (4x4x4)
+# 3D Tic-Tac-Toe (3x3x3)
 
 ## Overview
 
-This is a Python implementation of 3D Tic-Tac-Toe with a 4x4x4 board, converted from the original Java version. The game features an AI opponent that uses the minimax algorithm with alpha-beta pruning.
+This is a Python implementation of 3D Tic-Tac-Toe with a 3x3x3 board, converted from the original Java version. The game features an AI opponent that uses the minimax algorithm with alpha-beta pruning.
 
 ## Features
 
-- **4x4x4 Game Board**: Four layers, each with a 4x4 grid (64 total spaces)
+- **3x3x3 Game Board**: Three layers, each with a 3x3 grid (27 total spaces)
 - **Fancy Canvas Icons**: Beautiful X and O pieces with gradients, shadows, and 3D effects
   - Blue gradient X pieces with highlights
   - Red/pink gradient O pieces with depth
@@ -15,7 +15,7 @@ This is a Python implementation of 3D Tic-Tac-Toe with a 4x4x4 board, converted 
 - **Three Difficulty Levels**:
   - **Easy**: 1 move lookahead
   - **Medium**: 2 moves lookahead
-  - **Hard**: 4 moves lookahead (very challenging!)
+  - **Hard**: 6 moves lookahead (very challenging!)
 - **Customizable Settings**:
   - Choose your piece (X or O)
   - Choose who goes first (Human or Computer)
@@ -50,9 +50,9 @@ python3 ttt3d_4x4x4.py
 
 ## How to Play
 
-1. **Objective**: Get 4 of your pieces in a row (horizontally, vertically, or diagonally) across any dimension
+1. **Objective**: Get 3 of your pieces in a row (horizontally, vertically, or diagonally) across any dimension
 
-2. **Winning Combinations** (76 total):
+2. **Winning Combinations** (49 total):
    - Rows within a single layer
    - Columns within a single layer
    - Diagonals within a single layer
@@ -76,15 +76,13 @@ python3 ttt3d_4x4x4.py
 
 ## Game Board Layout
 
-The game displays 4 layers arranged in a 2x2 grid:
+The game displays 3 layers arranged horizontally:
 
 ```
-Layer 1 | Layer 2
---------|--------
-Layer 3 | Layer 4
+Layer 1 | Layer 2 | Layer 3
 ```
 
-Each layer is a 4x4 grid. Think of these as stacked on top of each other.
+Each layer is a 3x3 grid. Think of these as stacked on top of each other.
 
 ## Technical Details
 
@@ -106,12 +104,12 @@ The game features enhanced visual design with Canvas-based rendering:
 
 ### Winning Combinations
 
-The game has 76 possible winning combinations:
-- 16 rows (4 per layer × 4 layers)
-- 16 columns (4 per layer × 4 layers)
-- 8 layer diagonals (2 per layer × 4 layers)
-- 16 vertical lines (through all 4 layers)
-- 16 vertical plane diagonals
+The game has 49 possible winning combinations:
+- 9 rows (3 per layer × 3 layers)
+- 9 columns (3 per layer × 3 layers)
+- 6 layer diagonals (2 per layer × 3 layers)
+- 9 vertical lines (through all 3 layers)
+- 12 vertical plane diagonals
 - 4 space diagonals (corner to corner through all dimensions)
 
 ### AI Algorithm
@@ -132,24 +130,22 @@ The computer uses a **minimax algorithm with alpha-beta pruning**:
 
 - **Easy**: Looks 1 move ahead, uses random moves when going first
 - **Medium**: Looks 2 moves ahead, uses random moves when going first
-- **Hard**: Looks 4 moves ahead, uses strategic opening moves
+- **Hard**: Looks 6 moves ahead, uses strategic opening moves (plays optimally!)
 
-Note: Due to the larger board size (64 vs 27 spaces), the lookahead depth is reduced compared to the original 3x3x3 game to maintain reasonable performance.
+Note: The 3x3x3 board has 27 spaces, making it possible for the computer to look ahead 6 moves on hard difficulty without performance issues.
 
 ## Differences from Original Java Version
 
-1. **Board Size**: Expanded from 3x3x3 (27 spaces) to 4x4x4 (64 spaces)
-2. **Winning Condition**: Changed from 3-in-a-row to 4-in-a-row
-3. **GUI Framework**: Converted from Java Swing to Python tkinter
-4. **Visual Design**: Enhanced with Canvas-based fancy icons (gradients, shadows, 3D effects)
-5. **Layout**: Simplified board visualization using a 2x2 grid of layers
-6. **Lookahead Depth**: Reduced on hard difficulty (4 vs 6) due to larger search space
-7. **Win Highlighting**: Changed from red lines to gold-colored pieces
+1. **GUI Framework**: Converted from Java Swing to Python tkinter
+2. **Visual Design**: Enhanced with Canvas-based fancy icons (gradients, shadows, 3D effects)
+3. **Layout**: Horizontal arrangement of 3 layers instead of perspective drawing
+4. **Mac Compatibility**: Direct canvas event binding for cross-platform support
+5. **Win Highlighting**: Changed from red lines to gold-colored pieces
 
 ## Testing
 
 ### Verify Winning Combinations
-Run the test suite to verify all 76 winning combinations are correct:
+Run the test suite to verify all 49 winning combinations are correct:
 
 ```bash
 python3 test_winning_combos.py
