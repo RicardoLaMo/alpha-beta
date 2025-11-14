@@ -7,6 +7,10 @@ This is a Python implementation of 3D Tic-Tac-Toe with a 4x4x4 board, converted 
 ## Features
 
 - **4x4x4 Game Board**: Four layers, each with a 4x4 grid (64 total spaces)
+- **Fancy Canvas Icons**: Beautiful X and O pieces with gradients, shadows, and 3D effects
+  - Blue gradient X pieces with highlights
+  - Red/pink gradient O pieces with depth
+  - Gold-colored winning pieces for celebration
 - **AI Opponent**: Intelligent computer player using minimax with alpha-beta pruning
 - **Three Difficulty Levels**:
   - **Easy**: 1 move lookahead
@@ -17,7 +21,7 @@ This is a Python implementation of 3D Tic-Tac-Toe with a 4x4x4 board, converted 
   - Choose who goes first (Human or Computer)
   - Adjust difficulty level
 - **Score Tracking**: Keeps track of wins for both players
-- **Win Highlighting**: Winning combinations are highlighted in red
+- **Win Highlighting**: Winning combinations are highlighted in gold
 
 ## Requirements
 
@@ -84,6 +88,22 @@ Each layer is a 4x4 grid. Think of these as stacked on top of each other.
 
 ## Technical Details
 
+### Visual Design
+
+The game features enhanced visual design with Canvas-based rendering:
+
+- **FancyIcon Class**: Custom drawing system for game pieces
+  - `draw_x()`: Blue gradient X with shadow effects
+  - `draw_o()`: Red/pink gradient O with 3D highlights
+  - `draw_x_win()`: Gold X for winning combinations
+  - `draw_o_win()`: Gold O for winning combinations
+
+- **Color Scheme**:
+  - X pieces: Blue (#2E86DE, #54A0FF, #74B9FF)
+  - O pieces: Red/Pink (#EE5A6F, #FF6B81, #FF9FF3)
+  - Winning pieces: Gold (#FFD700, #DAA520)
+  - Shadows: Gray (#888888) for depth perception
+
 ### Winning Combinations
 
 The game has 76 possible winning combinations:
@@ -96,10 +116,17 @@ The game has 76 possible winning combinations:
 
 ### AI Algorithm
 
-The computer uses a minimax algorithm with alpha-beta pruning:
+The computer uses a **minimax algorithm with alpha-beta pruning**:
+
 - **Minimax**: Explores possible future moves to find the best choice
 - **Alpha-Beta Pruning**: Optimizes the search by eliminating branches that won't affect the final decision
+  - Alpha (α): Best value for maximizer (computer)
+  - Beta (β): Best value for minimizer (human)
+  - Pruning occurs when α >= β
+  - Reduces search space by ~94-99.6% depending on depth
 - **Heuristic Function**: Evaluates board positions by counting available winning paths
+
+**Implementation Details**: See `ALPHA_BETA_VERIFICATION.md` for complete verification of the alpha-beta pruning implementation.
 
 ### Difficulty Levels
 
@@ -114,22 +141,38 @@ Note: Due to the larger board size (64 vs 27 spaces), the lookahead depth is red
 1. **Board Size**: Expanded from 3x3x3 (27 spaces) to 4x4x4 (64 spaces)
 2. **Winning Condition**: Changed from 3-in-a-row to 4-in-a-row
 3. **GUI Framework**: Converted from Java Swing to Python tkinter
-4. **Layout**: Simplified board visualization using a 2x2 grid of layers
-5. **Lookahead Depth**: Reduced on hard difficulty (4 vs 6) due to larger search space
+4. **Visual Design**: Enhanced with Canvas-based fancy icons (gradients, shadows, 3D effects)
+5. **Layout**: Simplified board visualization using a 2x2 grid of layers
+6. **Lookahead Depth**: Reduced on hard difficulty (4 vs 6) due to larger search space
+7. **Win Highlighting**: Changed from red lines to gold-colored pieces
 
 ## Testing
 
-Run the test suite to verify winning combinations:
+### Verify Winning Combinations
+Run the test suite to verify all 76 winning combinations are correct:
 
 ```bash
 python3 test_winning_combos.py
 ```
 
+### Test Fancy Icons
+Display all icon variations in a test window:
+
+```bash
+python3 test_fancy_icons.py
+```
+
+This will show:
+- Regular X (blue gradient)
+- Regular O (red gradient)
+- Winning X (gold)
+- Winning O (gold)
+
 ## Known Limitations
 
-- The GUI is not as visually polished as the original Java version
 - No 3D perspective drawing of the boards (uses simple 2x2 layer layout instead)
 - On hard difficulty, the AI can take a few seconds to compute moves
+- Requires tkinter for GUI (usually included with Python)
 
 ## Credits
 

@@ -3,10 +3,12 @@
 3D Tic-Tac-Toe Game (4x4x4)
 Converted from Java to Python with expanded board size
 Uses minimax algorithm with alpha-beta pruning for AI
+
+Enhanced with fancy Canvas-based icons for X and O pieces
 """
 
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, Canvas
 import random
 from typing import List, Tuple, Optional
 from dataclasses import dataclass
@@ -18,6 +20,161 @@ class OneMove:
     layer: int
     row: int
     column: int
+
+
+class FancyIcon:
+    """Creates fancy Canvas-based icons for X and O pieces"""
+
+    @staticmethod
+    def draw_x(canvas: Canvas, size: int = 40):
+        """Draw a fancy X with gradient effect"""
+        canvas.delete("all")
+        padding = size * 0.2
+
+        # Draw shadow for depth
+        canvas.create_line(
+            padding + 2, padding + 2,
+            size - padding + 2, size - padding + 2,
+            width=size * 0.15,
+            fill='#888888',
+            capstyle=tk.ROUND
+        )
+        canvas.create_line(
+            size - padding + 2, padding + 2,
+            padding + 2, size - padding + 2,
+            width=size * 0.15,
+            fill='#888888',
+            capstyle=tk.ROUND
+        )
+
+        # Draw main X in blue gradient
+        canvas.create_line(
+            padding, padding,
+            size - padding, size - padding,
+            width=size * 0.15,
+            fill='#2E86DE',
+            capstyle=tk.ROUND,
+            smooth=True
+        )
+        canvas.create_line(
+            size - padding, padding,
+            padding, size - padding,
+            width=size * 0.15,
+            fill='#54A0FF',
+            capstyle=tk.ROUND,
+            smooth=True
+        )
+
+        # Add highlights
+        canvas.create_line(
+            padding + 2, padding,
+            size - padding - 2, size - padding,
+            width=size * 0.05,
+            fill='#74B9FF',
+            capstyle=tk.ROUND
+        )
+
+    @staticmethod
+    def draw_o(canvas: Canvas, size: int = 40):
+        """Draw a fancy O with gradient effect"""
+        canvas.delete("all")
+        padding = size * 0.2
+
+        # Draw shadow for depth
+        canvas.create_oval(
+            padding + 2, padding + 2,
+            size - padding + 2, size - padding + 2,
+            outline='#888888',
+            width=size * 0.15
+        )
+
+        # Draw outer circle in red gradient
+        canvas.create_oval(
+            padding, padding,
+            size - padding, size - padding,
+            outline='#EE5A6F',
+            width=size * 0.15
+        )
+
+        # Draw inner highlight circle
+        inner_padding = size * 0.25
+        canvas.create_oval(
+            inner_padding, inner_padding,
+            size - inner_padding, size - inner_padding,
+            outline='#FF6B81',
+            width=size * 0.08
+        )
+
+        # Add highlight arc for 3D effect
+        canvas.create_arc(
+            padding + 2, padding + 2,
+            size - padding - 2, size - padding - 2,
+            start=120,
+            extent=60,
+            outline='#FF9FF3',
+            width=size * 0.05,
+            style=tk.ARC
+        )
+
+    @staticmethod
+    def draw_x_win(canvas: Canvas, size: int = 40):
+        """Draw a fancy X in winning color (gold)"""
+        canvas.delete("all")
+        padding = size * 0.2
+
+        # Draw shadow
+        canvas.create_line(
+            padding + 2, padding + 2,
+            size - padding + 2, size - padding + 2,
+            width=size * 0.18,
+            fill='#DAA520',
+            capstyle=tk.ROUND
+        )
+        canvas.create_line(
+            size - padding + 2, padding + 2,
+            padding + 2, size - padding + 2,
+            width=size * 0.18,
+            fill='#DAA520',
+            capstyle=tk.ROUND
+        )
+
+        # Draw main X in gold
+        canvas.create_line(
+            padding, padding,
+            size - padding, size - padding,
+            width=size * 0.15,
+            fill='#FFD700',
+            capstyle=tk.ROUND
+        )
+        canvas.create_line(
+            size - padding, padding,
+            padding, size - padding,
+            width=size * 0.15,
+            fill='#FFD700',
+            capstyle=tk.ROUND
+        )
+
+    @staticmethod
+    def draw_o_win(canvas: Canvas, size: int = 40):
+        """Draw a fancy O in winning color (gold)"""
+        canvas.delete("all")
+        padding = size * 0.2
+
+        # Draw shadow
+        canvas.create_oval(
+            padding + 2, padding + 2,
+            size - padding + 2, size - padding + 2,
+            outline='#DAA520',
+            width=size * 0.18
+        )
+
+        # Draw main O in gold
+        canvas.create_oval(
+            padding, padding,
+            size - padding, size - padding,
+            outline='#FFD700',
+            width=size * 0.15
+        )
 
 
 class TTT3D:
@@ -36,6 +193,9 @@ class TTT3D:
         self.board_buttons = [[[None for _ in range(self.BOARD_SIZE)]
                                for _ in range(self.BOARD_SIZE)]
                               for _ in range(self.LAYERS)]
+        self.board_canvases = [[[None for _ in range(self.BOARD_SIZE)]
+                                for _ in range(self.BOARD_SIZE)]
+                               for _ in range(self.LAYERS)]
 
         # Game settings
         self.human_first = True
@@ -154,22 +314,43 @@ class TTT3D:
                 text=f"Layer {layer + 1}",
                 font=('Tahoma', 10, 'bold'),
                 padx=5,
-                pady=5
+                pady=5,
+                bg='#f0f0f0'
             )
             layer_frame.grid(row=layer // 2, column=layer % 2, padx=5, pady=5)
 
             # Create 4x4 grid for this layer
             for row in range(4):
                 for col in range(4):
-                    btn = tk.Button(
-                        layer_frame,
-                        text="",
-                        font=('Arial Bold', 16),
-                        width=3,
-                        height=1,
-                        command=lambda l=layer, r=row, c=col: self.human_move(l, r, c)
+                    # Create a frame to hold both button and canvas
+                    cell_frame = tk.Frame(layer_frame, bg='white', relief=tk.RAISED, bd=2)
+                    cell_frame.grid(row=row, column=col, padx=2, pady=2)
+
+                    # Create canvas for drawing fancy icons
+                    canvas = Canvas(
+                        cell_frame,
+                        width=45,
+                        height=45,
+                        bg='white',
+                        highlightthickness=0
                     )
-                    btn.grid(row=row, column=col, padx=2, pady=2)
+                    canvas.pack()
+                    self.board_canvases[layer][row][col] = canvas
+
+                    # Create invisible button overlay for clicks
+                    btn = tk.Button(
+                        cell_frame,
+                        text="",
+                        font=('Arial', 1),
+                        width=6,
+                        height=2,
+                        command=lambda l=layer, r=row, c=col: self.human_move(l, r, c),
+                        bg='white',
+                        activebackground='#e0e0e0',
+                        relief=tk.FLAT,
+                        cursor='hand2'
+                    )
+                    btn.place(x=0, y=0, width=45, height=45)
                     self.board_buttons[layer][row][col] = btn
 
         # Right side - Controls
@@ -329,7 +510,10 @@ class TTT3D:
                 for col in range(4):
                     self.config[layer][row][col] = -1
                     btn = self.board_buttons[layer][row][col]
-                    btn.config(text="", state=tk.NORMAL, fg='black')
+                    btn.config(state=tk.NORMAL, bg='white')
+                    # Clear the canvas
+                    canvas = self.board_canvases[layer][row][col]
+                    canvas.delete("all")
 
     def human_move(self, layer: int, row: int, col: int):
         """Handle human player move"""
@@ -338,10 +522,14 @@ class TTT3D:
 
         # Make the move
         self.config[layer][row][col] = 0 if self.human_piece == 'X' else 1
-        self.board_buttons[layer][row][col].config(
-            text=self.human_piece,
-            state=tk.DISABLED
-        )
+        self.board_buttons[layer][row][col].config(state=tk.DISABLED, bg='#f5f5f5')
+
+        # Draw fancy icon
+        canvas = self.board_canvases[layer][row][col]
+        if self.human_piece == 'X':
+            FancyIcon.draw_x(canvas, 45)
+        else:
+            FancyIcon.draw_o(canvas, 45)
 
         # Check for win
         move = OneMove(layer, row, col)
@@ -371,10 +559,14 @@ class TTT3D:
             layer, row, col = random.choice(empty_spaces)
             piece_value = 1 if self.computer_piece == 'X' else 0
             self.config[layer][row][col] = piece_value
-            self.board_buttons[layer][row][col].config(
-                text=self.computer_piece,
-                state=tk.DISABLED
-            )
+            self.board_buttons[layer][row][col].config(state=tk.DISABLED, bg='#f5f5f5')
+
+            # Draw fancy icon
+            canvas = self.board_canvases[layer][row][col]
+            if self.computer_piece == 'X':
+                FancyIcon.draw_x(canvas, 45)
+            else:
+                FancyIcon.draw_o(canvas, 45)
 
     def computer_plays(self):
         """Computer makes a move using minimax algorithm"""
@@ -394,10 +586,15 @@ class TTT3D:
                         if self.check_win(computer_value, move):
                             # Make the winning move
                             self.config[layer][row][col] = computer_value
-                            self.board_buttons[layer][row][col].config(
-                                text=self.computer_piece,
-                                state=tk.DISABLED
-                            )
+                            self.board_buttons[layer][row][col].config(state=tk.DISABLED, bg='#f5f5f5')
+
+                            # Draw fancy icon
+                            canvas = self.board_canvases[layer][row][col]
+                            if self.computer_piece == 'X':
+                                FancyIcon.draw_x(canvas, 45)
+                            else:
+                                FancyIcon.draw_o(canvas, 45)
+
                             self.status_label.config(
                                 text="I win! Press New Game to play again.",
                                 fg='red'
@@ -435,10 +632,14 @@ class TTT3D:
             layer, row, col = best_move
             computer_value = 1 if self.computer_piece == 'X' else 0
             self.config[layer][row][col] = computer_value
-            self.board_buttons[layer][row][col].config(
-                text=self.computer_piece,
-                state=tk.DISABLED
-            )
+            self.board_buttons[layer][row][col].config(state=tk.DISABLED, bg='#f5f5f5')
+
+            # Draw fancy icon
+            canvas = self.board_canvases[layer][row][col]
+            if self.computer_piece == 'X':
+                FancyIcon.draw_x(canvas, 45)
+            else:
+                FancyIcon.draw_o(canvas, 45)
 
     def look_ahead(self, player_value: int, alpha: int, beta: int) -> int:
         """Minimax algorithm with alpha-beta pruning"""
@@ -569,15 +770,21 @@ class TTT3D:
                 col = remainder % 4
                 self.final_win_buttons.append((layer, row, col))
 
-        # Disable all buttons except winning combination
+        # Disable all buttons and redraw winning pieces in gold
         for layer in range(4):
             for row in range(4):
                 for col in range(4):
                     btn = self.board_buttons[layer][row][col]
+                    btn.config(state=tk.DISABLED)
+
+                    # Redraw winning pieces in gold
                     if (layer, row, col) in self.final_win_buttons:
-                        btn.config(fg='red', state=tk.DISABLED)
-                    else:
-                        btn.config(state=tk.DISABLED)
+                        canvas = self.board_canvases[layer][row][col]
+                        piece_value = self.config[layer][row][col]
+                        if piece_value == 0:  # X
+                            FancyIcon.draw_x_win(canvas, 45)
+                        elif piece_value == 1:  # O
+                            FancyIcon.draw_o_win(canvas, 45)
 
     def update_score(self):
         """Update the score display"""
