@@ -31,8 +31,10 @@ class AtariTicTacToe3D:
         self.WIN_LENGTH = 4
 
         # Visual configuration
-        self.CELL_SIZE = 60
-        self.CELL_PADDING = 2  # Reduced padding for cleaner look
+        self.CELL_SIZE = 40  # Size for isometric cells
+        self.CELL_PADDING = 2
+        self.ISO_ANGLE = 30  # Isometric angle in degrees
+        self.LAYER_SPACING = 15  # Vertical spacing between layers
 
         # Atari-inspired color scheme
         self.BG_COLOR = '#1a1a2e'  # Dark blue-black
@@ -171,15 +173,167 @@ class AtariTicTacToe3D:
         boards_frame = tk.Frame(main_frame, bg=self.BG_COLOR)
         boards_frame.grid(row=2, column=0, padx=(0, 20))
 
-        # Create 4 layers in a 1x4 vertical stack
-        for layer in range(4):
-            self.create_layer_board(boards_frame, layer, layer, 0)
+        # Create single isometric 3D view of all layers
+        self.create_isometric_board(boards_frame)
 
         # Control panel
         control_frame = tk.Frame(main_frame, bg=self.BG_COLOR)
         control_frame.grid(row=2, column=1, sticky='n')
 
         self.create_controls(control_frame)
+
+    def create_isometric_board(self, parent):
+        """Create a single canvas with isometric 3D stacked layers"""
+        # Calculate canvas size for isometric view
+        canvas_width = 500
+        canvas_height = 650
+
+        main_canvas_frame = tk.Frame(parent, bg=self.BG_COLOR, relief=tk.RAISED, bd=3)
+        main_canvas_frame.pack(padx=5, pady=5)
+
+        # Create single canvas for all layers
+        self.main_canvas = Canvas(
+            main_canvas_frame,
+            width=canvas_width,
+            height=canvas_height,
+            bg=self.BG_COLOR,
+            highlightthickness=0
+        )
+        self.main_canvas.pack(padx=5, pady=5)
+
+        # Store layer canvases list for compatibility (now just references the main canvas)
+        self.layer_canvases = [self.main_canvas] * 4
+
+        # Store cell coordinates for click detection
+        self.cell_coords = {}
+
+        # Draw all layers
+        self.draw_all_layers()
+
+        # Bind events to main canvas
+        self.main_canvas.bind('<Button-1>', self.on_iso_click)
+        self.main_canvas.bind('<Motion>', self.on_iso_mouse_move)
+        self.main_canvas.bind('<Leave>', self.on_iso_mouse_leave)
+
+    def get_iso_coords(self, layer, row, col):
+        """Convert grid coordinates to isometric canvas coordinates"""
+        # Base position for each layer (stacking from top to bottom)
+        base_x = 180
+        base_y = 50 + layer * 145  # Stack layers vertically with spacing
+
+        # Isometric projection
+        # For isometric view: x goes right, y goes down-right
+        iso_x = col * (self.CELL_SIZE * 0.8) + row * 8
+        iso_y = row * (self.CELL_SIZE * 0.4) + col * 4
+
+        return base_x + iso_x, base_y + iso_y
+
+    def draw_iso_cell(self, layer, row, col, tags='cell'):
+        """Draw a single isometric cell with 3D depth"""
+        # Get corner coordinates
+        x, y = self.get_iso_coords(layer, row, col)
+
+        # Cell dimensions
+        w = self.CELL_SIZE * 0.8  # Width (horizontal)
+        h = self.CELL_SIZE * 0.4  # Height (vertical)
+        depth = 8  # Depth offset for 3D effect
+
+        # Top face of the cell (parallelogram)
+        top_face = [
+            x, y,                    # Top left
+            x + w, y,                # Top right
+            x + w + depth, y + depth,  # Bottom right
+            x + depth, y + depth,    # Bottom left
+        ]
+
+        # Draw the top face
+        cell_color = self.LAYER_COLORS[layer]
+        outline_color = self.CELL_OUTLINE
+
+        # Draw top face
+        cell_id = self.main_canvas.create_polygon(
+            top_face,
+            fill=cell_color,
+            outline=outline_color,
+            width=1,
+            tags=(tags, f'layer{layer}', f'cell_{layer}_{row}_{col}', 'top_face')
+        )
+
+        # Draw right side face (if not last column)
+        if col < 3 or row < 3:
+            right_face = [
+                x + w, y,
+                x + w + depth, y + depth,
+                x + w + depth, y + depth + h,
+                x + w, y + h,
+            ]
+            self.main_canvas.create_polygon(
+                right_face,
+                fill=self.LAYER_COLORS[min(layer, 3)],
+                outline=outline_color,
+                width=1,
+                tags=(tags, f'layer{layer}', f'cell_{layer}_{row}_{col}', 'side_face')
+            )
+
+        # Draw bottom side face
+        if row < 3:
+            bottom_face = [
+                x + depth, y + depth,
+                x + w + depth, y + depth,
+                x + w + depth, y + depth + h,
+                x + depth, y + depth + h,
+            ]
+            self.main_canvas.create_polygon(
+                bottom_face,
+                fill=self.LAYER_COLORS[min(layer, 3)],
+                outline=outline_color,
+                width=1,
+                tags=(tags, f'layer{layer}', f'cell_{layer}_{row}_{col}', 'bottom_face')
+            )
+
+        # Store coordinates for click detection (use top face)
+        self.cell_coords[(layer, row, col)] = (x, y, w, h, top_face)
+
+        return cell_id
+
+    def draw_layer_outline(self, layer):
+        """Draw the outline/frame of a layer"""
+        # Draw connecting lines between layers
+        if layer < 3:  # Don't draw for bottom layer
+            # Draw vertical connection lines at corners
+            for row, col in [(0, 0), (0, 3), (3, 0), (3, 3)]:
+                x1, y1 = self.get_iso_coords(layer, row, col)
+                x2, y2 = self.get_iso_coords(layer + 1, row, col)
+
+                self.main_canvas.create_line(
+                    x1, y1, x2, y2,
+                    fill=self.CELL_OUTLINE,
+                    width=2,
+                    tags=('layer_connection', f'layer{layer}')
+                )
+
+    def draw_all_layers(self):
+        """Draw all 4 layers in isometric view"""
+        # Draw from top layer to bottom for proper layering
+        for layer in range(4):
+            # Draw layer connections first
+            self.draw_layer_outline(layer)
+
+            # Draw all cells in this layer
+            for row in range(4):
+                for col in range(4):
+                    self.draw_iso_cell(layer, row, col)
+
+            # Add layer label
+            base_x = 180
+            base_y = 50 + layer * 145
+            self.main_canvas.create_text(
+                base_x - 80, base_y + 50,
+                text=f"L{layer + 1}",
+                fill=self.GRID_COLOR,
+                font=('Courier', 12, 'bold'),
+                tags='layer_label'
+            )
 
     def create_layer_board(self, parent, layer: int, grid_row: int, grid_col: int):
         """Create a single layer board with Atari styling"""
@@ -347,7 +501,7 @@ class AtariTicTacToe3D:
         instructions.pack(pady=(20, 0))
 
     def get_cell_coords(self, row: int, col: int) -> Tuple[int, int, int, int]:
-        """Get canvas coordinates for a cell"""
+        """Get canvas coordinates for a cell (legacy support)"""
         x1 = self.CELL_PADDING + col * (self.CELL_SIZE + self.CELL_PADDING)
         y1 = self.CELL_PADDING + row * (self.CELL_SIZE + self.CELL_PADDING)
         x2 = x1 + self.CELL_SIZE
@@ -355,7 +509,7 @@ class AtariTicTacToe3D:
         return x1, y1, x2, y2
 
     def get_cell_from_pos(self, x: int, y: int) -> Optional[Tuple[int, int]]:
-        """Get cell row and column from canvas position"""
+        """Get cell row and column from canvas position (legacy support)"""
         for row in range(4):
             for col in range(4):
                 x1, y1, x2, y2 = self.get_cell_coords(row, col)
@@ -363,50 +517,124 @@ class AtariTicTacToe3D:
                     return row, col
         return None
 
-    def draw_x(self, canvas: Canvas, row: int, col: int, color: str, animated: bool = True):
-        """Draw an X in a cell with Atari styling"""
-        x1, y1, x2, y2 = self.get_cell_coords(row, col)
-        padding = 12
+    def point_in_parallelogram(self, px, py, points):
+        """Check if point (px, py) is inside parallelogram defined by points"""
+        # Use cross product method to check if point is inside polygon
+        def sign(p1x, p1y, p2x, p2y, p3x, p3y):
+            return (p1x - p3x) * (p2y - p3y) - (p2x - p3x) * (p1y - p3y)
 
-        if animated:
-            # Animate drawing the X
-            self.animate_x(canvas, x1, y1, x2, y2, padding, color)
-        else:
-            # Draw instantly
-            canvas.create_line(
-                x1 + padding, y1 + padding,
-                x2 - padding, y2 - padding,
-                fill=color,
-                width=6,
-                capstyle=tk.ROUND,
-                tags='piece'
-            )
-            canvas.create_line(
-                x2 - padding, y1 + padding,
-                x1 + padding, y2 - padding,
-                fill=color,
-                width=6,
-                capstyle=tk.ROUND,
-                tags='piece'
-            )
+        # Convert flat list to coordinate pairs
+        coords = [(points[i], points[i+1]) for i in range(0, len(points), 2)]
 
-    def draw_o(self, canvas: Canvas, row: int, col: int, color: str, animated: bool = True):
-        """Draw an O in a cell with Atari styling"""
-        x1, y1, x2, y2 = self.get_cell_coords(row, col)
-        padding = 12
+        # Check if point is on same side of all edges
+        num_vertices = len(coords)
+        has_neg = False
+        has_pos = False
 
-        if animated:
-            # Animate drawing the O
-            self.animate_o(canvas, x1, y1, x2, y2, padding, color)
-        else:
-            # Draw instantly
-            canvas.create_oval(
-                x1 + padding, y1 + padding,
-                x2 - padding, y2 - padding,
-                outline=color,
-                width=6,
-                tags='piece'
-            )
+        for i in range(num_vertices):
+            v1 = coords[i]
+            v2 = coords[(i + 1) % num_vertices]
+
+            d = sign(px, py, v1[0], v1[1], v2[0], v2[1])
+
+            if d < 0:
+                has_neg = True
+            if d > 0:
+                has_pos = True
+
+        return not (has_neg and has_pos)
+
+    def get_cell_from_iso_pos(self, x: int, y: int) -> Optional[Tuple[int, int, int]]:
+        """Get layer, row, col from isometric canvas position"""
+        # Check all cells to find which one contains the click point
+        for (layer, row, col), (cx, cy, w, h, points) in self.cell_coords.items():
+            if self.point_in_parallelogram(x, y, points):
+                return (layer, row, col)
+        return None
+
+    def on_iso_click(self, event):
+        """Handle click on isometric view"""
+        if self.game_over or self.is_animating:
+            return
+
+        cell = self.get_cell_from_iso_pos(event.x, event.y)
+        if cell is None:
+            return
+
+        layer, row, col = cell
+        if self.board[layer][row][col] != -1:
+            return
+
+        # Make human move
+        self.make_move(layer, row, col, is_human=True)
+
+    def on_iso_mouse_move(self, event):
+        """Handle mouse hover on isometric view"""
+        if self.game_over:
+            return
+
+        # Clear previous hover
+        self.main_canvas.delete('hover')
+
+        cell = self.get_cell_from_iso_pos(event.x, event.y)
+        if cell is not None:
+            layer, row, col = cell
+            if self.board[layer][row][col] == -1:
+                # Draw hover effect
+                x, y, w, h, points = self.cell_coords[(layer, row, col)]
+                self.main_canvas.create_polygon(
+                    points,
+                    fill=self.HOVER_COLOR,
+                    outline='',
+                    tags='hover'
+                )
+
+    def on_iso_mouse_leave(self, event):
+        """Clear hover effect when mouse leaves canvas"""
+        self.main_canvas.delete('hover')
+
+    def draw_x(self, layer: int, row: int, col: int, color: str, animated: bool = True):
+        """Draw an X in an isometric cell"""
+        # Get center of the isometric cell
+        cx, cy = self.get_iso_coords(layer, row, col)
+
+        # Size of the X
+        size = self.CELL_SIZE * 0.3
+
+        # Draw X
+        self.main_canvas.create_line(
+            cx - size, cy - size/2,
+            cx + size, cy + size/2,
+            fill=color,
+            width=4,
+            capstyle=tk.ROUND,
+            tags=('piece', f'piece_{layer}_{row}_{col}')
+        )
+        self.main_canvas.create_line(
+            cx + size, cy - size/2,
+            cx - size, cy + size/2,
+            fill=color,
+            width=4,
+            capstyle=tk.ROUND,
+            tags=('piece', f'piece_{layer}_{row}_{col}')
+        )
+
+    def draw_o(self, layer: int, row: int, col: int, color: str, animated: bool = True):
+        """Draw an O in an isometric cell"""
+        # Get center of the isometric cell
+        cx, cy = self.get_iso_coords(layer, row, col)
+
+        # Size of the O
+        size = self.CELL_SIZE * 0.3
+
+        # Draw O
+        self.main_canvas.create_oval(
+            cx - size, cy - size/2,
+            cx + size, cy + size/2,
+            outline=color,
+            width=4,
+            tags=('piece', f'piece_{layer}_{row}_{col}')
+        )
 
     def animate_x(self, canvas: Canvas, x1: int, y1: int, x2: int, y2: int,
                   padding: int, color: str, step: int = 0):
@@ -564,15 +792,11 @@ class AtariTicTacToe3D:
         # Update board state
         self.board[layer][row][col] = piece_value
 
-        # Draw piece
-        canvas = self.layer_canvases[layer]
-        if animated:
-            self.is_animating = True
-
+        # Draw piece on isometric board
         if piece == 'X':
-            self.draw_x(canvas, row, col, color, animated)
+            self.draw_x(layer, row, col, color, animated)
         else:
-            self.draw_o(canvas, row, col, color, animated)
+            self.draw_o(layer, row, col, color, animated)
 
         # Check for win or tie
         move = Move(layer, row, col)
@@ -775,25 +999,26 @@ class AtariTicTacToe3D:
         self.update_score()
 
     def highlight_winning_cells(self):
-        """Highlight the winning combination"""
+        """Highlight the winning combination in isometric view"""
         for layer, row, col in self.winning_cells:
-            canvas = self.layer_canvases[layer]
-            x1, y1, x2, y2 = self.get_cell_coords(row, col)
+            # Get cell coordinates
+            x, y, w, h, points = self.cell_coords[(layer, row, col)]
 
-            # Draw highlight rectangle
-            canvas.create_rectangle(
-                x1, y1, x2, y2,
+            # Draw highlight on the cell
+            self.main_canvas.create_polygon(
+                points,
+                fill='',
                 outline=self.HIGHLIGHT_COLOR,
-                width=4,
+                width=3,
                 tags='win_highlight'
             )
 
             # Redraw piece in gold
             piece_value = self.board[layer][row][col]
             if piece_value == 0:  # X
-                self.draw_x(canvas, row, col, self.HIGHLIGHT_COLOR, animated=False)
+                self.draw_x(layer, row, col, self.HIGHLIGHT_COLOR, animated=False)
             else:  # O
-                self.draw_o(canvas, row, col, self.HIGHLIGHT_COLOR, animated=False)
+                self.draw_o(layer, row, col, self.HIGHLIGHT_COLOR, animated=False)
 
     def update_score(self):
         """Update score display"""
@@ -813,10 +1038,10 @@ class AtariTicTacToe3D:
                 for col in range(4):
                     self.board[layer][row][col] = -1
 
-        # Clear all canvases and redraw cell backgrounds
-        for layer, canvas in enumerate(self.layer_canvases):
-            canvas.delete('all')
-            self.draw_grid(canvas, layer)
+        # Clear main canvas and redraw isometric view
+        self.main_canvas.delete('all')
+        self.cell_coords = {}
+        self.draw_all_layers()
 
     def new_game(self):
         """Start a new game"""
