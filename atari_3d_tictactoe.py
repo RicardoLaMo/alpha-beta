@@ -41,7 +41,7 @@ class AtariTicTacToe3D:
         self.X_COLOR = '#ee6c4d'  # Bright orange-red
         self.O_COLOR = '#4ecca3'  # Bright cyan
         self.HIGHLIGHT_COLOR = '#ffd700'  # Gold for wins
-        self.HOVER_COLOR = '#eeeeee44'  # Semi-transparent white
+        self.HOVER_COLOR = '#555555'  # Gray hover (tkinter doesn't support alpha in hex colors)
 
         # Game state
         self.board = [[[-1 for _ in range(self.BOARD_SIZE)]
@@ -170,11 +170,9 @@ class AtariTicTacToe3D:
         boards_frame = tk.Frame(main_frame, bg=self.BG_COLOR)
         boards_frame.grid(row=2, column=0, padx=(0, 20))
 
-        # Create 4 layers in a 2x2 grid
+        # Create 4 layers in a 1x4 vertical stack
         for layer in range(4):
-            row = layer // 2
-            col = layer % 2
-            self.create_layer_board(boards_frame, layer, row, col)
+            self.create_layer_board(boards_frame, layer, layer, 0)
 
         # Control panel
         control_frame = tk.Frame(main_frame, bg=self.BG_COLOR)
@@ -215,8 +213,8 @@ class AtariTicTacToe3D:
         canvas.pack(padx=5, pady=(0, 5))
         self.layer_canvases.append(canvas)
 
-        # Draw grid
-        self.draw_grid(canvas, layer)
+        # Draw grid - commented out to remove grid lines
+        # self.draw_grid(canvas, layer)
 
         # Bind click events
         canvas.bind('<Button-1>', lambda e, l=layer: self.on_cell_click(e, l))
@@ -566,7 +564,7 @@ class AtariTicTacToe3D:
             color = self.X_COLOR if piece == 'X' else self.O_COLOR
         else:
             piece = self.computer_piece
-            piece_value = 1 if piece == 'X' else 0
+            piece_value = 0 if piece == 'X' else 1  # Fixed: X=0, O=1
             color = self.X_COLOR if piece == 'X' else self.O_COLOR
 
         # Update board state
@@ -614,7 +612,7 @@ class AtariTicTacToe3D:
         """Find the best move using minimax with alpha-beta pruning"""
         best_score = -float('inf')
         best_move = None
-        computer_value = 1 if self.computer_piece == 'X' else 0
+        computer_value = 0 if self.computer_piece == 'X' else 1  # Fixed: X=0, O=1
 
         # Get all empty cells
         moves = []
@@ -824,7 +822,7 @@ class AtariTicTacToe3D:
         # Clear all canvases and redraw grids
         for layer, canvas in enumerate(self.layer_canvases):
             canvas.delete('all')
-            self.draw_grid(canvas, layer)
+            # self.draw_grid(canvas, layer)  # Grid removed
 
     def new_game(self):
         """Start a new game"""
