@@ -32,11 +32,12 @@ class AtariTicTacToe3D:
 
         # Visual configuration
         self.CELL_SIZE = 60
-        self.CELL_PADDING = 4
+        self.CELL_PADDING = 2  # Reduced padding for cleaner look
 
         # Atari-inspired color scheme
         self.BG_COLOR = '#1a1a2e'  # Dark blue-black
         self.LAYER_COLORS = ['#0f3460', '#16213e', '#1e3a5f', '#2d4a7c']  # Gradient blues
+        self.CELL_OUTLINE = '#2a4a6c'  # Subtle cell outline
         self.GRID_COLOR = '#4ecca3'  # Bright cyan for grid
         self.X_COLOR = '#ee6c4d'  # Bright orange-red
         self.O_COLOR = '#4ecca3'  # Bright cyan
@@ -213,8 +214,8 @@ class AtariTicTacToe3D:
         canvas.pack(padx=5, pady=(0, 5))
         self.layer_canvases.append(canvas)
 
-        # Draw grid - commented out to remove grid lines
-        # self.draw_grid(canvas, layer)
+        # Draw cell backgrounds
+        self.draw_grid(canvas, layer)
 
         # Bind click events
         canvas.bind('<Button-1>', lambda e, l=layer: self.on_cell_click(e, l))
@@ -222,26 +223,19 @@ class AtariTicTacToe3D:
         canvas.bind('<Leave>', lambda e, l=layer: self.on_mouse_leave(e, l))
 
     def draw_grid(self, canvas: Canvas, layer: int):
-        """Draw the grid lines for a layer"""
-        canvas_size = (self.CELL_SIZE * 4) + (self.CELL_PADDING * 5)
-
-        # Draw vertical and horizontal lines
-        for i in range(5):
-            pos = self.CELL_PADDING + (i * (self.CELL_SIZE + self.CELL_PADDING))
-            # Vertical lines
-            canvas.create_line(
-                pos, self.CELL_PADDING,
-                pos, canvas_size - self.CELL_PADDING,
-                fill=self.GRID_COLOR,
-                width=2
-            )
-            # Horizontal lines
-            canvas.create_line(
-                self.CELL_PADDING, pos,
-                canvas_size - self.CELL_PADDING, pos,
-                fill=self.GRID_COLOR,
-                width=2
-            )
+        """Draw cell outlines for visual separation (no grid lines)"""
+        # Draw individual cell rectangles with subtle borders
+        for row in range(4):
+            for col in range(4):
+                x1, y1, x2, y2 = self.get_cell_coords(row, col)
+                # Draw cell background with subtle outline
+                canvas.create_rectangle(
+                    x1, y1, x2, y2,
+                    outline=self.CELL_OUTLINE,
+                    fill=self.LAYER_COLORS[layer],
+                    width=1,
+                    tags='cell_border'
+                )
 
     def create_controls(self, parent):
         """Create the control panel"""
@@ -819,10 +813,10 @@ class AtariTicTacToe3D:
                 for col in range(4):
                     self.board[layer][row][col] = -1
 
-        # Clear all canvases and redraw grids
+        # Clear all canvases and redraw cell backgrounds
         for layer, canvas in enumerate(self.layer_canvases):
             canvas.delete('all')
-            # self.draw_grid(canvas, layer)  # Grid removed
+            self.draw_grid(canvas, layer)
 
     def new_game(self):
         """Start a new game"""
